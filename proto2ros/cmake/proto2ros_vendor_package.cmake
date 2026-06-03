@@ -106,7 +106,7 @@ macro(proto2ros_vendor_package target)
     ${build_include_directories} "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
   )
   rosidl_get_typesupport_target(cpp_interfaces ${target} "rosidl_typesupport_cpp")
-  target_link_libraries(${target}_conversions ${cpp_interfaces} ${ARG_CPP_DEPENDENCIES})
+  target_link_libraries(${target}_conversions PUBLIC ${cpp_interfaces} ${ARG_CPP_DEPENDENCIES})
   target_link_libraries(${target}_conversions PUBLIC
     ${builtin_interfaces_TARGETS}
     proto2ros::proto2ros_conversions

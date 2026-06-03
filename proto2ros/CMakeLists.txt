@@ -63,7 +63,7 @@ target_include_directories(${PROJECT_NAME}_conversions PUBLIC
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 )
 rosidl_get_typesupport_target(${PROJECT_NAME}_cpp_msgs ${PROJECT_NAME} "rosidl_typesupport_cpp")
-target_link_libraries(${PROJECT_NAME}_conversions ${${PROJECT_NAME}_cpp_msgs} protobuf::libprotobuf)
+target_link_libraries(${PROJECT_NAME}_conversions PUBLIC ${${PROJECT_NAME}_cpp_msgs} protobuf::libprotobuf)
 target_link_libraries(${PROJECT_NAME}_conversions PUBLIC
   ${builtin_interfaces_TARGETS}
   rclcpp::rclcpp
