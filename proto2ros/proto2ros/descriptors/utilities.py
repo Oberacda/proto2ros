@@ -27,6 +27,16 @@ from google.protobuf.descriptor_pb2 import FieldDescriptorProto, FileDescriptorP
 from proto2ros.utilities import identity_lru_cache
 
 
+def _get_label(field_descriptor) -> int:
+    # protobuf 5.x upb C extension removed label from FieldDescriptor; fall back to CopyToProto
+    label = getattr(field_descriptor, "label", None)
+    if label is not None:
+        return label
+    proto = FieldDescriptorProto()
+    field_descriptor.CopyToProto(proto)
+    return proto.label
+
+
 @identity_lru_cache()
 def index_source_code_locations(file_descriptor: FileDescriptorProto) -> Dict[Tuple[int, ...], SourceCodeInfo.Location]:
     """Indexes all source code locations in a source file descriptor by path."""
@@ -45,7 +55,7 @@ def walk(proto: Any, path: Sequence[int]) -> Iterable[Any]:
         an iterable over Protobuf message members.
     """
     field_descriptor, field_value = next(item for item in proto.ListFields() if item[0].number == path[0])
-    if field_descriptor.label == field_descriptor.LABEL_REPEATED:
+    if _get_label(field_descriptor) == FieldDescriptorProto.LABEL_REPEATED:
         field_value = field_value[path[1]]
         path = path[1:]
     yield field_value
@@ -68,7 +78,7 @@ def locate_repeated(member: str, proto: Any) -> Iterable[Tuple[Sequence[int], An
     if member not in proto.DESCRIPTOR.fields_by_name:
         raise ValueError(f"{member} is not a member of the given protobuf")
     member_field_descriptor = proto.DESCRIPTOR.fields_by_name[member]
-    if member_field_descriptor.label != FieldDescriptorProto.LABEL_REPEATED:
+    if _get_label(member_field_descriptor) != FieldDescriptorProto.LABEL_REPEATED:
         raise ValueError(f"{member} is not a repeated member of the given protobuf")
     for i, member_item in enumerate(getattr(proto, member)):
         yield (member_field_descriptor.number, i), member_item
