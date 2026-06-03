@@ -1,5 +1,5 @@
 # Copyright (c) 2023 Robotics and AI Institute LLC dba RAI Institute. All rights reserved.
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16...4.0)
 if(POLICY CMP0148)
   cmake_policy(SET CMP0148 OLD)  # to accommodate rosidl pipeline
 endif()
@@ -20,7 +20,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of the build." FORCE)
   # Set the possible values of the build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   include(CheckIPOSupported)
@@ -64,7 +64,11 @@ target_include_directories(${PROJECT_NAME}_conversions PUBLIC
 )
 rosidl_get_typesupport_target(${PROJECT_NAME}_cpp_msgs ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(${PROJECT_NAME}_conversions ${${PROJECT_NAME}_cpp_msgs} protobuf::libprotobuf)
-ament_target_dependencies(${PROJECT_NAME}_conversions builtin_interfaces rclcpp std_msgs)
+target_link_libraries(${PROJECT_NAME}_conversions PUBLIC
+  ${builtin_interfaces_TARGETS}
+  rclcpp::rclcpp
+  ${std_msgs_TARGETS}
+)
 
 find_program(CLANG_TIDY_EXECUTABLE NAMES "clang-tidy" REQUIRED)
 set(CXX_CLANG_TIDY "${CLANG_TIDY_EXECUTABLE}"

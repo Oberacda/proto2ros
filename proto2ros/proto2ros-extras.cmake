@@ -5,7 +5,6 @@ if(POLICY CMP0148)
 endif()
 
 find_package(Python3 REQUIRED)
-find_package(PythonInterp REQUIRED)
 find_package(Protobuf REQUIRED)
 if(BUILD_TESTING)
   find_package(ament_cmake_mypy QUIET)

@@ -1,5 +1,5 @@
 # Copyright (c) 2023 Robotics and AI Institute LLC dba RAI Institute. All rights reserved.
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16...4.0)
 if(POLICY CMP0148)
   cmake_policy(SET CMP0148 OLD)  # to accommodate rosidl pipeline
 endif()
@@ -71,8 +71,13 @@ target_include_directories(${PROJECT_NAME}_conversions PUBLIC
 rosidl_get_typesupport_target(${PROJECT_NAME}_cpp_msgs ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(${PROJECT_NAME}_conversions
   ${${PROJECT_NAME}_cpp_msgs} ${PROJECT_NAME}_proto protobuf::libprotobuf)
-ament_target_dependencies(${PROJECT_NAME}_conversions
-  builtin_interfaces geometry_msgs sensor_msgs proto2ros rclcpp)
+target_link_libraries(${PROJECT_NAME}_conversions PUBLIC
+  ${builtin_interfaces_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${sensor_msgs_TARGETS}
+  proto2ros::proto2ros_conversions
+  rclcpp::rclcpp
+)
 
 rosidl_generated_python_package_add(
   ${PROJECT_NAME}_additional_modules
